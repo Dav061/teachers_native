@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import axios from 'axios';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
-export type OptionData = {
+export type TeacherData = {
   id: number;
   title: string;
   faculty: string;
@@ -12,18 +12,18 @@ export type OptionData = {
 }
 
 interface ObjectCardProps {
-  option: OptionData;
+  teacher: TeacherData;
   onDetailsPress: () => void; 
 }
 
-const ObjectCard: React.FC<ObjectCardProps> = ({ option }) => {
+const ObjectCard: React.FC<ObjectCardProps> = ({ teacher }) => {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <Image source={{ uri: option?.image}} style={styles.image} />
+        <Image source={{ uri: teacher?.image}} style={styles.image} />
         <View style={styles.details}>
-          <Text style={styles.title}>{option?.title}</Text>
-          <Text style={styles.info}>{option?.faculty}</Text>
+          <Text style={styles.title}>{teacher?.title}</Text>
+          <Text style={styles.info}>{teacher?.faculty}</Text>
 
           {/* <Text style={styles.price}>{object.price}</Text> */}
 
