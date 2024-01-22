@@ -20,7 +20,10 @@ type RootStackParamList = {
     OptionDetailsScreen: { option: OptionData };
   };
   
-  type MainScreenNavigationProp = StackNavigationProp<RootStackParamList, 'MainScreen'>;
+  type MainScreenNavigationProp = StackNavigationProp<
+    RootStackParamList, 
+    'MainScreen'
+  >
   
   interface MainScreenProps {
     navigation: MainScreenNavigationProp;
@@ -33,43 +36,30 @@ type RootStackParamList = {
   
     const getOptions = async () => {
       try {
-          const response = await axios('http://192.168.0.30:8000/options', {
+          const response = await axios(
+            `http://192.168.0.30:8000/options/?search=${searchQuery}`, 
+              {
               method: 'GET',
-          });
+              }
+          );
           const options = response.data.options;
           const newArr = options.map((raw: ReceivedOptionsData) => ({
               id: raw.id,
               title: raw.title,
               faculty: raw.faculty,
               description: raw.description,
-              image: raw.image,
+              image: raw.image ? raw.image.replace("localhost", "192.168.0.30") : "dd",
               features: raw.features
-          }));
-          setOptions(newArr)
-          setTimeout(getOptions, 1000); // вызов getOptions каждые 1 секунду
-      }
-      catch(e){
-        throw e
-      }
-     };
+          }))
+          setFilteredOptions(newArr)
+        } catch(e){
+          throw e
+        }
+      };
 
-    useEffect(() => {
-      getOptions();
-    }, []);
-  
-    useEffect(() => {
-      if (searchQuery === '') {
-        setFilteredOptions(options);
-      } else {
-        const filtered = options.filter(
-          (option) =>
-            option.title.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-        setFilteredOptions(filtered);
-      }
-      console.log('title', searchQuery)
-      console.log('')
-    }, [searchQuery, options]);
+      useEffect(() => {
+        getOptions();
+      }, [searchQuery, options]);
   
     const handleDetailsPress = (option: OptionData) => {
       console.log('Details Pressed:', option.title);
@@ -78,11 +68,16 @@ type RootStackParamList = {
   
     const renderOptionCard = ({ item }: { item: OptionData }) => {
       return (
-        <TouchableOpacity onPress={() => handleDetailsPress(item)}>
+      <TouchableOpacity
+        style={styles.cardContainer}
+        onPress={() => handleDetailsPress(item)}
+      >
+        <View>
           <OptionCard option={item} onDetailsPress={() => {}} />
-        </TouchableOpacity>
-      );
-    };
+        </View>
+      </TouchableOpacity>
+    )
+  }
   
     return (
       <View style={styles.container}>
@@ -93,11 +88,14 @@ type RootStackParamList = {
           onChangeText={(text) => setSearchQuery(text)}
           value={searchQuery}
         />
-        <FlatList
-          data={filteredOptions}
-          renderItem={renderOptionCard}
-          keyExtractor={(item) => item.id.toString()}
-        />
+        <View style={{ flex: 1 }}>
+          <FlatList
+            contentContainerStyle={styles.aaa}
+            data={filteredOptions}
+            renderItem={renderOptionCard}
+            keyExtractor={(item) => item.id.toString()}
+          ></FlatList>
+        </View>
       </View>
     );
   };
@@ -107,6 +105,13 @@ type RootStackParamList = {
       flex: 1,
       paddingTop: 0,
     },
+    aaa: {
+      // flex: 1,
+      flexDirection: "row",
+      // justifyContent: "space-between",
+      gap: 2.5,
+      flexWrap: "wrap",
+    },
     input: {
       height: 40,
       borderWidth: 1,
@@ -115,6 +120,11 @@ type RootStackParamList = {
       paddingHorizontal: 10,
       marginBottom: 10,
       marginTop: 10,
+    },
+    cardContainer: {
+      // width: "100%",
+      width: 190,
+      height: 300,
     },
   });
   
