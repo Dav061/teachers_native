@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, FlatList, TextInput, StyleSheet } from 'react-native';
 import axios from 'axios';
-import OptionCard, {OptionData} from './optionCard';
+import TeacherCard, {TeacherData} from './teacherCard';
 import NavigationBar from './navbar';
 import {  TouchableOpacity, Text } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-export type ReceivedOptionsData = {
+export type ReceivedTeachersData = {
   id: number;
   title: string;
   faculty: string;
@@ -17,7 +17,7 @@ export type ReceivedOptionsData = {
 
 type RootStackParamList = {
     MainScreen: undefined;
-    OptionDetailsScreen: { option: OptionData };
+    TeacherDetailsScreen: { teacher: TeacherData };
   };
   
   type MainScreenNavigationProp = StackNavigationProp<
@@ -30,20 +30,20 @@ type RootStackParamList = {
   }
   
   const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
-    const [options, setOptions] = useState<OptionData[]>([]);
-    const [filteredOptions, setFilteredOptions] = useState<OptionData[]>([]);
+    const [teachers, setTeachers] = useState<TeacherData[]>([]);
+    const [filteredTeachers, setFilteredTeachers] = useState<TeacherData[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>('');
   
-    const getOptions = async () => {
+    const getTeachers = async () => {
       try {
           const response = await axios(
-            `http://192.168.0.30:8000/options/?search=${searchQuery}`, 
+            `http://192.168.0.30:8000/teachers/?search=${searchQuery}`, 
               {
               method: 'GET',
               }
           );
-          const options = response.data.options;
-          const newArr = options.map((raw: ReceivedOptionsData) => ({
+          const teachers = response.data.teachers;
+          const newArr = teachers.map((raw: ReceivedTeachersData) => ({
               id: raw.id,
               title: raw.title,
               faculty: raw.faculty,
@@ -51,29 +51,29 @@ type RootStackParamList = {
               image: raw.image ? raw.image.replace("localhost", "192.168.0.30") : "dd",
               features: raw.features
           }))
-          setFilteredOptions(newArr)
+          setFilteredTeachers(newArr)
         } catch(e){
           throw e
         }
       };
 
       useEffect(() => {
-        getOptions();
-      }, [searchQuery, options]);
+        getTeachers();
+      }, [searchQuery, teachers]);
   
-    const handleDetailsPress = (option: OptionData) => {
-      console.log('Details Pressed:', option.title);
-      navigation.navigate('OptionDetailsScreen', { option });
+    const handleDetailsPress = (teacher: TeacherData) => {
+      console.log('Details Pressed:', teacher.title);
+      navigation.navigate('TeacherDetailsScreen', { teacher });
     };
   
-    const renderOptionCard = ({ item }: { item: OptionData }) => {
+    const renderTeacherCard = ({ item }: { item: TeacherData }) => {
       return (
       <TouchableOpacity
         style={styles.cardContainer}
         onPress={() => handleDetailsPress(item)}
       >
         <View>
-          <OptionCard option={item} onDetailsPress={() => {}} />
+          <TeacherCard teacher={item} onDetailsPress={() => {}} />
         </View>
       </TouchableOpacity>
     )
@@ -91,8 +91,8 @@ type RootStackParamList = {
         <View style={{ flex: 1 }}>
           <FlatList
             contentContainerStyle={styles.aaa}
-            data={filteredOptions}
-            renderItem={renderOptionCard}
+            data={filteredTeachers}
+            renderItem={renderTeacherCard}
             keyExtractor={(item) => item.id.toString()}
           ></FlatList>
         </View>

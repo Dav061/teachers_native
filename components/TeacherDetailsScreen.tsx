@@ -2,24 +2,24 @@ import React, {useState, } from 'react';
 import { View, Text, Button, Pressable, StyleSheet,Image } from 'react-native';
 import axios from 'axios';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { OptionData } from './optionCard';
+import { TeacherData } from './teacherCard';
 import NavigationBar from './navbar';
 
-type OptionDetailsRouteProp = RouteProp<{
-  optionDetailsScreen: { option: OptionData };
-}, 'optionDetailsScreen'>;
+type TeacherDetailsRouteProp = RouteProp<{
+  teacherDetailsScreen: { teacher: TeacherData };
+}, 'teacherDetailsScreen'>;
 
 const ObjectDetailsScreen: React.FC = () => {
   const navigation = useNavigation();
-  const route = useRoute<OptionDetailsRouteProp>();
-  const [currentOption, setOption] = useState<OptionData>()
-  const { option } = route.params;
-  const getOption = async () => {
+  const route = useRoute<TeacherDetailsRouteProp>();
+  const [currentTeacher, setTeacher] = useState<TeacherData>()
+  const { teacher } = route.params;
+  const getTeacher = async () => {
     try {
-        const response = await axios(`http://192.168.0.30:8000/options/${option.id}`, {
+        const response = await axios(`http://192.168.0.30:8000/teachers/${teacher.id}`, {
             method: 'GET',
         });
-        setOption({
+        setTeacher({
           id: response.data.id,
           title: response.data.title,
           faculty: response.data.faculty,
@@ -35,18 +35,18 @@ const ObjectDetailsScreen: React.FC = () => {
   };
 
   React.useEffect(() => {
-    getOption()
+    getTeacher()
   }, [])
 
   return (
     <View style={styles.container}>
       <NavigationBar />
       <View style={styles.content}>
-        <Image source={{ uri: option?.image }} style={styles.image} />
-        <Text style={styles.title}>ФИО: {option?.title}</Text>
-        <Text style={styles.info}>Факультет: {option?.faculty}</Text>
-        <Text style={styles.info}>Описание: {option?.description}</Text>
-        <Text style={styles.info}>Основные сведения: {option?.features}</Text>
+        <Image source={{ uri: teacher?.image }} style={styles.image} />
+        <Text style={styles.title}>ФИО: {teacher?.title}</Text>
+        <Text style={styles.info}>Факультет: {teacher?.faculty}</Text>
+        <Text style={styles.info}>Описание: {teacher?.description}</Text>
+        <Text style={styles.info}>Основные сведения: {teacher?.features}</Text>
       </View>
       <Pressable style={styles.button} onPress={() => navigation.goBack()}>
      <Text style={styles.text}>Назад</Text>
